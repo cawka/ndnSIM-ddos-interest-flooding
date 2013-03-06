@@ -1,0 +1,103 @@
+README.cch - A description of the .cch file format.
+
+A .cch file is a Rocketfuel-specific ISP topology
+representation.  Conversion to SGB, GT-ITM, and CAIDA's
+visualization tool format should be straightforward, but
+converters have not been written.  If you happen to write a
+conversion tool, we'd be happy to make it available to
+others.  trimcch.rb is included as an example in Ruby for
+extracting the incidence list.
+
+Included are three .cch files for each ISP:  
+
+asn.cch is the raw cch file, containing all links for nodes
+that could fall within the ISP.  This may include a chain of
+routers leading into an unnamed customer's address space.
+
+asn.r0.cch is the opposite, and includes only routers that
+we believe are part of the ISP because they're named like
+backbone and gateway routers (or at least as best as we can
+recover).
+
+asn.r1.cch is in between, including a "fringe" of radius 1
+around the backbone and gateway routers.  This is the
+dataset used primarily in the Rocketfuel paper because we
+expect it to be robust to problems in recovering the ISP's
+naming convention and it shows the most structure we're
+interested in, without router chains leading to customers.
+
+asn.r0.cch and asn.r1.cch can be recovered from asn.cch
+using trimcch.rb, but you may not yet have ruby installed.
+
+Each line of the .cch format is:
+
+uid @loc [+] [bb] (num_neigh) [&ext] -> <nuid-1> <nuid-2> ... {-euid} ... =name[!] rn
+
+or:
+
+-euid =externaladdress rn
+
+Fields enclosed in []'s are optional. 
+
+uid
+  A unique identifier of the node.  Negative unique identifiers
+  are external (euids).
+loc
+  The node's location. A location of "T" implies that the
+  router's location is ambiguous: possibly because it is
+  connected to routers of different locations.
++ 
+  If present, the node's location was derived from dns, 
+  If absent, the node's location was derived from its connectivity.
+bb
+  If present,  the node is a backbone node (connects to other cities)
+  If absent, it is an access (gateway) or customer router
+num_neigh
+  The number of neighbors of this node, which is the same as
+  the count of neighbors after the "->" sign.
+ext
+  If the router connects to other routers outside the ISP,
+  this is how many external connectsions are present.
+nuid-k
+  The uids of each neighbor.  The map is symmetric.
+  Links to external addresses are enclosed in {}'s.  Links
+  to other routers within the ISP are enclosed in <>'s.
+name
+  A DNS name of this node; only the "best" name is printed
+  when multiple names are found (for instance, names of
+  aliases).
+! 
+  If present, this router didn't respond to alias resolution:
+  it might not be a distinct router.   Usually these aren't in 
+  the core to confuse the topology, but they are a source of 
+  uncertainty.
+rn
+  The distance from a named gateway or backbone router.
+  Considering only those labelled r0 excludes all external
+  connections and customer routers.  r0 or r1 adds one hop
+  away.  n is capped at 5.
+  
+----
+ 
+trimcch.rb
+  Selects nodes from the cch file that match an expression,
+  and removes other links.  See the examples at the top of the
+  file.
+
+To recover an incidence matrix of ISP routers, the following
+ruby code can be used over the output of "trimcch.rb ' r0' x.cch":
+
+#!/usr/bin/ruby
+# converts a cch file (input argument) to an incidence list (stdout)
+# for each line l in the file named on the command line
+File.open(ARGV[0]).each { |l|
+  # print the first column, if a number, which is the node's id.
+  # then a space
+  # then all the nodes it's connected to, which are in angle brackets.
+  puts l.scan(/^(\d+)/).join(' ') + ' ' + l.scan(/<(\d+)>/).join(' ');
+}
+
+
+----------------
+
+Send comments to: {ratul,nspring}@cs.washington.edu

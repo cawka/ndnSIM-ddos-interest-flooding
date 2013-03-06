@@ -1,0 +1,11 @@
+graph G {
+0[shape="circle",width=0.1,label="",style=filled,fillcolor="green"];
+1[shape="circle",width=0.1,label="",style=filled,fillcolor="red"];
+2[shape="circle",width=0.1,label="",style=filled,fillcolor="red"];
+3[shape="circle",width=0.1,label="",style=filled,fillcolor="red"];
+4[shape="circle",width=0.1,label="",style=filled,fillcolor="red"];
+0--1 ;
+0--2 ;
+0--3 ;
+0--4 ;
+}

@@ -78,24 +78,56 @@ class Processor:
     def graph (self):
         subprocess.call ("./graphs/%s.R" % self.name, shell=True)
 
-class Scenario (Processor):
-    def __init__ (self, name):
+class ConvertTopologies (Processor):
+    def __init__ (self, name, runs, topologies, buildGraph = False):
         self.name = name
-        # other initialization, if any
+        self.runs = runs
+        self.topologies = topologies
+        self.buildGraph = buildGraph
+
+        for run in runs:
+            try:
+                os.mkdir ("topologies/bw-delay-rand-%d" % run)
+            except:
+                pass # ignore the error
 
     def simulate (self):
-        cmdline = ["./build/SCENARIO_TO_RUN"]
-        job = SimulationJob (cmdline)
-        pool.put (job)
+        for topology in self.topologies:
+            for run in self.runs:
+                cmdline = ["./build/rocketfuel-maps-cch-to-annotaded",
+                           "--topology=topologies/rocketfuel_maps_cch/%s.cch" % topology,
+                           "--run=%d" % run,
+                           "--output=topologies/bw-delay-rand-%d/%s" % (run, topology),
+                           "--buildGraph=%d" % self.buildGraph,
+                           "--keepLargestComponent=1",
+                           "--connectBackbones=1",
+                           "--clients=3",
+                           ]
+                job = SimulationJob (cmdline)
+                pool.put (job)
 
     def postprocess (self):
         # any postprocessing, if any
         pass
 
+    def graph (self):
+        pass
+
 try:
-    # Simulation, processing, and graph building
-    fig = Scenario (name="NAME_TO_CONFIGURE")
-    fig.run ()
+    conversion = ConvertTopologies (name="convert-topologies",
+                                    runs=[1],
+                                    topologies=["1221.r0",
+                                                "1239.r0",
+                                                "1755.r0",
+                                                "2914.r0",
+                                                "3257.r0",
+                                                "3356.r0",
+                                                "3967.r0",
+                                                "4755.r0",
+                                                "6461.r0",
+                                                "7018.r0",],
+                                    buildGraph = True)
+    conversion.run ()
 
 finally:
     pool.join ()
