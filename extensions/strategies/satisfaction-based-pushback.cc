@@ -200,13 +200,13 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
            fibFace != entry->m_faces.end ();
            fibFace ++)
         {
-          if (!fibFace->m_face->GetObject<Limits> ()->IsEnabled ())
+          if (!fibFace->GetFace ()->GetObject<Limits> ()->IsEnabled ())
             {
               unlimited = true;
               break;
             }
             
-          totalAllowance += fibFace->m_face->GetObject<Limits> ()->GetCurrentLimit ();
+          totalAllowance += fibFace->GetFace ()->GetObject<Limits> ()->GetCurrentLimit ();
           // totalAllowance += fibFace->m_face->GetObject<Limits> ()->GetMaxLimit ();
         }
       NS_LOG_DEBUG ("total: " << totalAllowance);

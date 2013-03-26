@@ -49,16 +49,16 @@ namespace fw {
 
 template<class Parent>
 TypeId
-FairQueueing<Parent>::GetTypeId ()
+TokenBucketWithPerInterfaceFairness<Parent>::GetTypeId ()
 {
   static TypeId tid = TypeId ((super::GetTypeId ().GetName ()+"::TokenBucketWithPerInterfaceFairness").c_str ())
     .SetGroupName ("Ndn")
     .template SetParent<super> ()
-    .template AddConstructor< FairQueueing<Parent> > ()
+    .template AddConstructor< TokenBucketWithPerInterfaceFairness<Parent> > ()
 
     .template AddAttribute ("Limit", "Limit type to be used (e.g., ns3::ndn::Limits::Window or ns3::ndn::Limits::Rate)",
                             StringValue ("ns3::ndn::Limits::Window"),
-                            MakeStringAccessor (&FairQueueing<Parent>::m_limitType),
+                            MakeStringAccessor (&TokenBucketWithPerInterfaceFairness<Parent>::m_limitType),
                             MakeStringChecker ())    
     ;
   
@@ -67,19 +67,19 @@ FairQueueing<Parent>::GetTypeId ()
 
 template<class Parent>
 std::string
-FairQueueing<Parent>::GetLogName ()
+TokenBucketWithPerInterfaceFairness<Parent>::GetLogName ()
 {
-  return super::GetLogName ()+".FairQueueing";
+  return super::GetLogName ()+".TokenBucketWithPerInterfaceFairness";
 }
 
 
 template<class Parent>
 void
-FairQueueing<Parent>::AddFace (Ptr<Face> face)
+TokenBucketWithPerInterfaceFairness<Parent>::AddFace (Ptr<Face> face)
 {
   ObjectFactory factory (m_limitType);
   Ptr<Limits> limits = factory.template Create<Limits> ();
-  limits->RegisterAvailableSlotCallback (MakeCallback (&FairQueueing<Parent>::ProcessFromQueue, this));
+  limits->RegisterAvailableSlotCallback (MakeCallback (&TokenBucketWithPerInterfaceFairness<Parent>::ProcessFromQueue, this));
   face->AggregateObject (limits);
   
   super::AddFace (face);
@@ -87,7 +87,7 @@ FairQueueing<Parent>::AddFace (Ptr<Face> face)
 
 template<class Parent>
 void
-FairQueueing<Parent>::RemoveFace (Ptr<Face> face)
+TokenBucketWithPerInterfaceFairness<Parent>::RemoveFace (Ptr<Face> face)
 {  
   for (PitQueueMap::iterator item = m_pitQueues.begin ();
        item != m_pitQueues.end ();
@@ -102,7 +102,7 @@ FairQueueing<Parent>::RemoveFace (Ptr<Face> face)
 
 template<class Parent>
 bool
-FairQueueing<Parent>::TrySendOutInterest (Ptr<Face> inFace,
+TokenBucketWithPerInterfaceFairness<Parent>::TrySendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
                                           Ptr<const InterestHeader> header,
                                           Ptr<const Packet> origPacket,
@@ -174,7 +174,7 @@ FairQueueing<Parent>::TrySendOutInterest (Ptr<Face> inFace,
 
 template<class Parent>
 void
-FairQueueing<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
+TokenBucketWithPerInterfaceFairness<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
 
@@ -197,7 +197,7 @@ FairQueueing<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry
 
 template<class Parent>
 void
-FairQueueing<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
+TokenBucketWithPerInterfaceFairness<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -216,7 +216,7 @@ FairQueueing<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
 
 template<class Parent>
 void
-FairQueueing<Parent>::ProcessFromQueue ()
+TokenBucketWithPerInterfaceFairness<Parent>::ProcessFromQueue ()
 {
   NS_LOG_FUNCTION (this);
   
@@ -278,8 +278,8 @@ namespace ndn {
 namespace fw {
 
 // ns3::ndn::fw::BestRoute::TokenBucketWithPerInterfaceFairness
-typedef FairQueueing<BestRoute> FairQueueingBestRoute;
-NS_OBJECT_ENSURE_REGISTERED(FairQueueingBestRoute);
+typedef TokenBucketWithPerInterfaceFairness<BestRoute> TokenBucketWithPerInterfaceFairnessBestRoute;
+NS_OBJECT_ENSURE_REGISTERED(TokenBucketWithPerInterfaceFairnessBestRoute);
 
 } // namespace fw
 } // namespace ndn

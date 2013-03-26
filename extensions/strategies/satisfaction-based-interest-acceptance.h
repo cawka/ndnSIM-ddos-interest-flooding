@@ -28,7 +28,7 @@
 #include "ns3/ndn-interest.h"
 #include "ns3/ndn-content-object.h"
 
-#include "extensions/stats.h"
+#include "stats.h"
 
 namespace ns3 {
 namespace ndn {
@@ -135,14 +135,14 @@ SatisfactionBasedInterestAcceptance<Parent>::CanSendOutInterest (Ptr<Face> inFac
        fibFace != pitEntry->GetFibEntry ()->m_faces.end ();
        fibFace ++)
     {
-      if (!fibFace->m_face->GetObject<Limits> ()->IsEnabled ())
+      if (!fibFace->GetFace ()->GetObject<Limits> ()->IsEnabled ())
         {
           unlimited = true;
           break;
         }
             
-      totalAllowance += fibFace->m_face->GetObject<Limits> ()->GetCurrentLimit ();
-      // totalAllowance += fibFace->m_face->GetObject<Limits> ()->GetMaxLimit ();
+      totalAllowance += fibFace->GetFace ()->GetObject<Limits> ()->GetCurrentLimit ();
+      // totalAllowance += fibFace->GetFace ()->GetObject<Limits> ()->GetMaxLimit ();
     }
   NS_LOG_DEBUG ("total: " << totalAllowance);
 

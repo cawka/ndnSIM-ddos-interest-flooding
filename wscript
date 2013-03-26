@@ -74,6 +74,7 @@ def build (bld):
         source = bld.path.ant_glob(['extensions/**/*.cc']),
         use = deps,
         cxxflags = [bld.env.CXX11_CMD],
+        includes = "extensions",
         )
 
     for scenario in bld.path.ant_glob (['scenarios/*.cc']):
@@ -83,7 +84,7 @@ def build (bld):
             features = ['cxx'],
             source = [scenario],
             use = deps + " extensions",
-            includes = "extensions"
+            includes = "extensions",
             )
 
 def shutdown (ctx):

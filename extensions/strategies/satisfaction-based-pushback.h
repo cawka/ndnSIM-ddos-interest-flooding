@@ -24,7 +24,7 @@
 
 #include <ns3/event-id.h>
 
-#include "extensions/stats.h"
+#include "stats.h"
 
 namespace ns3 {
 namespace ndn {
