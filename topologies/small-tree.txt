@@ -1,0 +1,21 @@
+router
+#node	city	latitude	longitude	partition
+gw-root	NA	1	10	0
+root2	NA	20	10	0
+root3	NA	40	10	0
+router-1-0	NA	60	20	1
+router-1-1	NA	60	0	2
+leaf-0	NA	80	40	1
+leaf-1	NA	80	20	3
+leaf-2	NA	80	0	2
+leaf-3	NA	80	-20	4
+link
+# from		to			capacity	metric	delay	queue
+gw-root		root2		10Mbps		1		10ms		100
+root2		root3		10Mbps		1		10ms		100
+root3		router-1-0	10Mbps		1		10ms		100
+root3		router-1-1	10Mbps		1		10ms		100
+router-1-0	leaf-0		10Mbps		1		10ms		100
+router-1-0	leaf-1		10Mbps		1		10ms		100
+router-1-1	leaf-2		10Mbps		1		10ms		100
+router-1-1	leaf-3		10Mbps		1		10ms		100

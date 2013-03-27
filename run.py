@@ -113,6 +113,42 @@ class ConvertTopologies (Processor):
     def graph (self):
         pass
 
+class InterestDdosAttack (Processor):
+    def __init__ (self, name, algorithms, topologies, evils, good, runs, folder, producer="gw", defaultRtt="250ms"):
+        self.name = name
+        self.algorithms = algorithms
+        self.topologies = topologies
+        self.evils = evils
+        self.good = good
+        self.runs = runs
+        self.folder = folder
+        self.producer = producer
+        self.defaultRtt = defaultRtt
+
+    def simulate (self):
+        for algorithm in self.algorithms:
+            for topology in self.topologies:
+                for evil in self.evils:
+                    for run in self.runs:
+                        cmdline = ["./build/interest-ddos-attack-and-mitigation-scenario",
+                                   "--algorithm=%s" % algorithm,
+                                   "--run=%d" % run,
+                                   "--topology=%s" % topology,
+                                   "--badCount=%d" % evil,
+                                   "--goodCount=%d" % self.good,
+                                   "--folder=%s" % self.folder,
+                                   "--producer=%s" % self.producer,
+                                   "--defaultRtt=%s" % self.defaultRtt,
+                                   ]
+                        job = SimulationJob (cmdline)
+                        pool.put (job)
+
+    def postprocess (self):
+        pass
+
+    def graph (self):
+        pass
+
 try:
     conversion = ConvertTopologies (name="convert-topologies",
                                     runs=[1],
@@ -127,7 +163,42 @@ try:
                                                 "6461.r0",
                                                 "7018.r0",],
                                     buildGraph = True)
-    conversion.run ()
+    # conversion.run ()
+
+    attackSmallTree = InterestDdosAttack (name="attack-small-tree",
+                                     algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
+                                     topologies = ["small-tree"],
+                                     evils = [1,2],
+                                     good  = 0, # number of client nodes minus number of evil nodes
+                                     runs = range(1,11), 
+                                     folder = "attackSmallTree",
+                                     producer = "gw",
+                                     defaultRtt = "80ms")
+    attackSmallTree.run ()
+
+
+    attackTree = InterestDdosAttack (name="attack-tree",
+                                     algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
+                                     topologies = ["tree"],
+                                     evils = range(1,10,2),
+                                     good  = 0, # number of client nodes minus number of evil nodes
+                                     runs = range(1,11), 
+                                     folder = "attackTree",
+                                     producer = "gw",
+                                     defaultRtt = "80ms")
+    attackTree.run ()
+
+    attackISP = InterestDdosAttack (name="attack-isp",
+                                    algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
+                                    topologies = ["tree"],
+                                    evils = [140],
+                                    good  = 0, # number of client nodes minus number of evil nodes
+                                    runs = range(1,11), 
+                                    folder = "attackISP",
+                                    producer = "gw",
+                                    defaultRtt = "330ms")
+    attackISP.run ()
+
 
 finally:
     pool.join ()

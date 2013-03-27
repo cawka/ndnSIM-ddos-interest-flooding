@@ -272,6 +272,8 @@ TokenBucketWithPerInterfaceFairness<Parent>::ProcessFromQueue ()
 
 
 #include <ns3/ndnSIM/model/fw/best-route.h>
+#include "satisfaction-based-pushback.h"
+#include "stats.h"
 
 namespace ns3 {
 namespace ndn {
@@ -280,6 +282,11 @@ namespace fw {
 // ns3::ndn::fw::BestRoute::TokenBucketWithPerInterfaceFairness
 typedef TokenBucketWithPerInterfaceFairness<BestRoute> TokenBucketWithPerInterfaceFairnessBestRoute;
 NS_OBJECT_ENSURE_REGISTERED(TokenBucketWithPerInterfaceFairnessBestRoute);
+
+// ns3::ndn::fw::BestRoute::Stats::SatisfactionBasedPushback::TokenBucketWithPerInterfaceFairness
+typedef TokenBucketWithPerInterfaceFairness< SatisfactionBasedPushback< BestRoute > > TokenBucketWithPerInterfaceFairnessSatisfactionBasedPushback;
+NS_OBJECT_ENSURE_REGISTERED(TokenBucketWithPerInterfaceFairnessSatisfactionBasedPushback);
+
 
 } // namespace fw
 } // namespace ndn

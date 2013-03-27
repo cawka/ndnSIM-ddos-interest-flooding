@@ -28,6 +28,23 @@ def options(opt):
 def configure(conf):
     conf.load("compiler_cxx boost ns3")
 
+    try:
+        conf.check(features='cxx cxxprogram', cxxflags="-std=c++11")
+        conf.env.CXX11_CMD = "-std=c++11"
+    except:
+        try:
+            conf.check(features='cxx cxxprogram', cxxflags="-std=c++0x")
+            conf.env.CXX11_CMD = "-std=c++0x"
+        except:
+            try:
+                version = conf.cmd_and_log(conf.env.CXX + ["--version"]).split("\n")[0]
+            except:
+                pass
+            else:
+                conf.msg("Compiler version:", version, color="RED")
+                print "Bad compiler. Require GCC >= 4.4 or recent version of Clang."
+                raise
+
     conf.check_boost(lib='system iostreams')
     boost_version = conf.env.BOOST_VERSION.split('_')
     if int(boost_version[0]) < 1 or int(boost_version[1]) < 48:
@@ -84,6 +101,7 @@ def build (bld):
             features = ['cxx'],
             source = [scenario],
             use = deps + " extensions",
+            cxxflags = [bld.env.CXX11_CMD],
             includes = "extensions",
             )
 

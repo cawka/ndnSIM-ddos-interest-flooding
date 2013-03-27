@@ -120,3 +120,10 @@ You can edit ``run.py`` script and ``scenarios/rocketfuel-maps-cch-to-annotaded.
 
 For more information about Rocketfuel topology files, please refer to http://www.cs.washington.edu/research/networking/rocketfuel/
 
+Interest flooding attack and attack mitigation mechanisms
+---------------------------------------------------------
+
+### Small binary tree topology
+
+    ./run.py -s attack-small-tree
+

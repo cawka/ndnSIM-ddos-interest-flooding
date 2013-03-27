@@ -1,0 +1,75 @@
+router
+
+#node	city	latitude    longitude	mpi
+gw-root NA	-84	    5		0
+bb-1	NA 	-66 	    5		0
+bb-2	NA	-48	    5		0
+bb-3	NA	-30	    26		0
+bb-4	NA	-29	    -16		0
+bb-5	NA	-14	    49		1
+bb-6	NA	-1	    18		1
+bb-7	NA	-1	    -8		1
+bb-8	NA	-14	    -39		1
+cgw-1	NA	1	    78		2
+cgw-2	NA	15	    54		2
+cgw-3	NA	29	    35		2
+cgw-4	NA	35	    15		2
+cgw-5	NA	35	    -5		3
+cgw-6	NA	29	    -25		3
+cgw-7	NA	15	    -44		3
+cgw-8	NA	1	    -68		3
+leaf-1	NA	39	    125		4
+leaf-2	NA	49	    103		5
+leaf-3	NA	33	    85		4
+leaf-4	NA	50	    68		5
+leaf-5	NA	79	    66		4
+leaf-6	NA	60	    44		5
+leaf-7	NA	83	    34		4
+leaf-8	NA	77	    14		6
+leaf-9	NA	77	    -4		4
+leaf-10	NA	83	    -24		6
+leaf-11	NA	60	    -34		4
+leaf-12	NA	79	    -56		6
+leaf-13	NA	50	    -58		4
+leaf-14	NA	33	    -75		7
+leaf-15	NA	49	    -93		4
+leaf-16	NA	39	    -115	7
+
+link
+
+# from          to              capacity	metric	delay           queue
+gw-root         bb-1		10Mbps		1	4.765970ms	100
+bb-1		bb-2		10Mbps		1	5.833820ms	100
+bb-2		bb-3		10Mbps		1	9.081129ms	100
+bb-2		bb-4		10Mbps		1	5.046869ms	100
+bb-3		bb-5		10Mbps		1	2.818378ms	100
+bb-3		bb-6		10Mbps		1	7.558042ms	100
+bb-4		bb-7		10Mbps		1	6.183690ms	100
+bb-4		bb-8		10Mbps		1	2.505063ms	100
+
+bb-5		cgw-1		10Mbps		1	9.097463ms	100
+bb-5		cgw-2		10Mbps		1	9.827855ms	100
+bb-6		cgw-3		10Mbps		1	8.102172ms	100
+bb-6		cgw-4		10Mbps		1	9.021660ms	100
+bb-7		cgw-5		10Mbps		1	3.101476ms	100
+bb-7		cgw-6		10Mbps		1	7.298317ms	100
+bb-8		cgw-7		10Mbps		1	8.988383ms	100
+bb-8		cgw-8		10Mbps		1	6.839839ms	100
+
+cgw-1		leaf-1	        10Mbps		1	4.721427ms	100
+cgw-1		leaf-2	        10Mbps		1	1.007012ms	100
+cgw-2		leaf-3	        10Mbps		1	4.341718ms	100
+cgw-2		leaf-4	        10Mbps		1	6.108870ms	100
+cgw-3		leaf-5	        10Mbps		1	9.130111ms	100
+cgw-3		leaf-6	        10Mbps		1	9.666064ms	100
+cgw-4		leaf-7	        10Mbps		1	4.770098ms	100
+cgw-4		leaf-8	        10Mbps		1	8.653099ms	100
+cgw-5		leaf-9	        10Mbps		1	2.604923ms	100
+cgw-5		leaf-10	        10Mbps		1	8.050278ms	100
+cgw-6		leaf-11	        10Mbps		1	5.486993ms	100
+cgw-6		leaf-12	        10Mbps		1	0.140417ms	100
+cgw-7		leaf-13	        10Mbps		1	7.197047ms	100
+cgw-7		leaf-14	        10Mbps		1	3.988235ms	100
+cgw-8		leaf-15	        10Mbps		1	8.248450ms	100
+cgw-8		leaf-16         10Mbps		1	6.681532ms	100
+
