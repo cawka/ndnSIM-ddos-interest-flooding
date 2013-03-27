@@ -123,7 +123,40 @@ For more information about Rocketfuel topology files, please refer to http://www
 Interest flooding attack and attack mitigation mechanisms
 ---------------------------------------------------------
 
-### Small binary tree topology
+### Two-level binary tree topology
+
+To perform 10 runs of the simulation for different Interest Flooding mitigation algorithms for 2-level binary tree topology with different number of attackers (1 or 2), use the following:
 
     ./run.py -s attack-small-tree
 
+After simulation finishes (it can take a couple of hours), the script will build a set of graphs in `graphs/pdf/attackSmallTree` that show Interest and Data rates passing through each simulation node.
+
+To build additional graphs (min-max satisfaction ratios versus time and satisfaction ratios versus number of the attackers), you can run the following:
+
+    ./run.py -p figureX
+
+    ./run.py figureXX
+
+Note that graph building scripts require R package (http://www.r-project.org/) to be properly installed and configured on the system.  If you have installed R, but it gives you error, you may need to manually install missing packages (refer to R documentation).
+
+### Four-level binary tree topology
+
+The following commands will run simulation with four-level binary tree topology (can take several hours to finish):
+
+    ./run.py -s attack-tree
+
+Additional graphs (Figure 6 and Figure 7 from the "Interest Flooding Attack and Countermeasures in Named Data Networking" paper by Afanasyev et al.) can be build using:
+
+    ./run.py -p figure6
+
+    ./run.py figure7
+
+### ISP-like topology
+
+The following commands will run simulation with ISP-like topology (can take many hours to finish):
+
+    ./run.py -s attack-isp
+
+Additional graphs (Figure 9 from the paper) can be build using:
+
+    ./run.py -p figure9
