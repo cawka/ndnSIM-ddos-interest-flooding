@@ -76,6 +76,7 @@ class Processor:
                 pool.join ()
             if args.simulate or args.postprocess:
                 self.postprocess ()
+                pool.join ()
             if args.graph:
                 self.graph ()
 
@@ -147,7 +148,7 @@ class InterestDdosAttack (Processor):
                         job = SimulationJob (cmdline)
                         pool.put (job)
 
-    def convert_sqlite3 (self):
+    def postprocess (self):
         print "Convert data to sqlite and reduce data size"
 
         for algorithm in self.algorithms:
@@ -176,10 +177,6 @@ class InterestDdosAttack (Processor):
                         # print cmd
                         subprocess.call (cmd, shell=True)
 
-
-    def postprocess (self):
-        self.convert_sqlite3 ()
-
     def graph (self):
         print "graph_rate_verification"
 
@@ -199,6 +196,81 @@ class InterestDdosAttack (Processor):
                     job = SimulationJob (cmdline)
                     pool.put (job)
 
+class SatisfactionMinManFigures (InterestDdosAttack):
+    def __init__ (self, name, scenario):
+        self.name = name
+        self.algorithms = scenario.algorithms
+        self.topologies = scenario.topologies
+        self.evils = scenario.evils
+        self.good = scenario.good
+        self.runs = scenario.runs
+        self.folder = scenario.folder
+        self.producer = scenario.producer
+        self.defaultRtt = scenario.defaultRtt
+
+    def simulate (self):
+        # Here we just assume that the relevant simulation data is already exists
+        pass
+
+    def postprocess (self):
+        print "Aggregate data"
+
+        for algorithm in self.algorithms:
+            for topology in self.topologies:
+                for evil in self.evils:
+                    cmdline = ["./graphs/preprocess-satisfaction.R",
+                               algorithm,
+                               topology,
+                               str(evil),
+                               ",".join([str(run) for run in self.runs]),
+                               self.folder,
+                               str(self.good),
+                               self.producer,
+                               ]
+                    job = SimulationJob (cmdline)
+                    print ">>> "+" ".join (cmdline)+"<<< \n";
+                    pool.put (job)
+
+    def graph (self):
+        print "SatisfactionMinManFigures"
+
+        for topology in self.topologies:
+            cmdline = ["./graphs/satisfaction-min-max-vs-time.R",
+                       ",".join(self.algorithms),
+                       topology,
+                       ",".join([str(evil) for evil in self.evils]),
+                       ",".join([str(run) for run in self.runs]),
+                       self.folder,
+                       str(self.good),
+                       self.producer
+                       ]
+            job = SimulationJob (cmdline)
+            pool.put (job)
+
+class SatisfactionNumberOfAttackersFigures (SatisfactionMinManFigures):
+    def simulate (self):
+        # Here we just assume that the relevant simulation data is already exists
+        pass
+
+    def postprocess (self):
+        pass
+
+    def graph (self):
+        print "SatisfactionNumberOfAttackersFigures"
+
+        for topology in self.topologies:
+            cmdline = ["./graphs/satisfaction-vs-number-of-attackers.R",
+                       ",".join(self.algorithms),
+                       topology,
+                       ",".join([str(evil) for evil in self.evils]),
+                       ",".join([str(run) for run in self.runs]),
+                       self.folder,
+                       str(self.good),
+                       self.producer
+                       ]
+            job = SimulationJob (cmdline)
+            pool.put (job)
+
 try:
     conversion = ConvertTopologies (name="convert-topologies",
                                     runs=[1],
@@ -215,40 +287,46 @@ try:
                                     buildGraph = True)
     # conversion.run ()
 
-    attackSmallTree = InterestDdosAttack (name="attack-small-tree",
-                                     algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
-                                     topologies = ["small-tree"],
-                                     evils = [1,2],
-                                     good  = 0, # number of client nodes minus number of evil nodes
-                                     runs = range(1,11), 
-                                     folder = "attackSmallTree",
-                                     producer = "gw",
-                                     defaultRtt = "80ms")
-    attackSmallTree.run ()
-
-
-    attackTree = InterestDdosAttack (name="attack-tree",
-                                     algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
-                                     topologies = ["tree"],
-                                     evils = range(1,10,2),
-                                     good  = 0, # number of client nodes minus number of evil nodes
-                                     runs = range(1,11), 
-                                     folder = "attackTree",
-                                     producer = "gw",
-                                     defaultRtt = "80ms")
-    attackTree.run ()
-
-    attackISP = InterestDdosAttack (name="attack-isp",
+    smallTree = InterestDdosAttack (name="attack-small-tree",
                                     algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
-                                    topologies = ["tree"],
-                                    evils = [140],
+                                    topologies = ["small-tree"],
+                                    evils = [1,2],
                                     good  = 0, # number of client nodes minus number of evil nodes
                                     runs = range(1,11), 
-                                    folder = "attackISP",
+                                    folder = "attackSmallTree",
                                     producer = "gw",
-                                    defaultRtt = "330ms")
-    attackISP.run ()
+                                    defaultRtt = "80ms")
+    smallTree.run ()
 
+    tree = InterestDdosAttack (name="attack-tree",
+                               algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
+                               topologies = ["tree"],
+                               evils = range(1,10,2),
+                               good  = 0, # number of client nodes minus number of evil nodes
+                               runs = range(1,11), 
+                               folder = "attackTree",
+                               producer = "gw",
+                               defaultRtt = "80ms")
+    tree.run ()
+
+    isp = InterestDdosAttack (name="attack-isp",
+                              algorithms = ["fairness", "satisfaction-accept", "satisfaction-pushback"],
+                              topologies = ["tree"],
+                              evils = [140],
+                              good  = 0, # number of client nodes minus number of evil nodes
+                              runs = range(1,11), 
+                              folder = "attackISP",
+                              producer = "gw",
+                              defaultRtt = "330ms")
+    isp.run ()
+
+    SatisfactionMinManFigures (name="figureX", scenario=smallTree).run ()
+    SatisfactionMinManFigures (name="figure6", scenario=tree).run ()
+    SatisfactionMinManFigures (name="figure9", scenario=isp).run ()
+
+    SatisfactionNumberOfAttackersFigures (name="figureXX", scenario=smallTree).run ()
+    SatisfactionNumberOfAttackersFigures (name="figure7",  scenario=tree).run ()
+    # SatisfactionNumberOfAttackersFigures (name="figureYY", scenario=isp).run ()
 
 finally:
     pool.join ()
