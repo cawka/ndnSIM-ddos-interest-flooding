@@ -23,6 +23,9 @@ parser.add_argument('-l', '--list', dest="list", action='store_true', default=Fa
 parser.add_argument('-s', '--simulate', dest="simulate", action='store_true', default=False,
                     help='Run simulation and postprocessing (false by default)')
 
+parser.add_argument('-p', '--postprocess', dest="postprocess", action='store_true', default=False,
+                    help='Run postprocessing (false by default, always true if simulate is enabled)')
+
 parser.add_argument('-g', '--no-graph', dest="graph", action='store_false', default=True,
                     help='Do not build a graph for the scenario (builds a graph by default)')
 
@@ -71,6 +74,7 @@ class Processor:
             if args.simulate:
                 self.simulate ()
                 pool.join ()
+            if args.simulate or args.postprocess:
                 self.postprocess ()
             if args.graph:
                 self.graph ()
@@ -143,11 +147,57 @@ class InterestDdosAttack (Processor):
                         job = SimulationJob (cmdline)
                         pool.put (job)
 
+    def convert_sqlite3 (self):
+        print "Convert data to sqlite and reduce data size"
+
+        for algorithm in self.algorithms:
+            for topology in self.topologies:
+                for evil in self.evils:
+                    for run in self.runs:
+
+                        name = "results/%s/%s-topo-%s-evil-%d-good-%d-producer-%s-run-%d" % (
+                            self.folder,
+                            algorithm,
+                            topology,
+                            evil,
+                            self.good,
+                            self.producer,
+                            run)
+                        print "Converting %s" % name
+
+                        bzip = "%s.txt.bz2" % name
+                        sqlite = "%s.db" % name
+
+                        subprocess.call ("rm -f \"%s\"" % sqlite, shell=True)
+                        cmd = "bzcat \"%s\" | tail -n +2 | awk -F\"\t\" '{if (NF == 9) {print $1\"|\"$2\"|\"$3\"|\"$5\"|\"$6\"|\"$7}}' | sqlite3 -cmd \"create table data_tmp (Time int, Node text, FaceId int, Type text, Packets real, Kilobytes real)\" -cmd \".import /dev/stdin data_tmp\" \"%s\"" % (bzip, sqlite)
+                        subprocess.call (cmd, shell=True)
+
+                        cmd = "sqlite3 -cmd \"create table data as select Time,Node,Type,sum(Packets) as Packets, sum(Kilobytes) as Kilobytes from data_tmp where Type in ('InData', 'OutInterests') group by Time,Node,Type\" -cmd \"drop table data_tmp\" -cmd \"vacuum\" \"%s\" </dev/null"  % sqlite
+                        # print cmd
+                        subprocess.call (cmd, shell=True)
+
+
     def postprocess (self):
-        pass
+        self.convert_sqlite3 ()
 
     def graph (self):
-        pass
+        print "graph_rate_verification"
+
+        for algorithm in self.algorithms:
+            for topology in self.topologies:
+                for evil in self.evils:
+                    # print "Scenario [%s], topology [%s], evils [%d], run [%d]" % (prefix, topology, evil, run)
+                    cmdline = ["./graphs/rates.R",
+                               algorithm,
+                               topology,
+                               str(evil),
+                               ",".join([str(run) for run in self.runs]),
+                               self.folder,
+                               str(self.good),
+                               self.producer,
+                               ]
+                    job = SimulationJob (cmdline)
+                    pool.put (job)
 
 try:
     conversion = ConvertTopologies (name="convert-topologies",
