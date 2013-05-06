@@ -160,3 +160,14 @@ The following commands will run simulation with ISP-like topology (can take many
 Additional graphs (Figure 9 from the paper) can be build using:
 
     ./run.py -p figure9
+
+**Note that provided scripts rely on R (http://www.r-project.org/) with sqldf, proto, reshape2, ggplot2, scales, plyr, and doBy modules to be installed.**  For example, after you install R, run the following to install necessary modules:
+
+    sudo R
+    install.packages ('sqldf')
+    install.packages ('proto')
+    install.packages ('reshape2')
+    install.packages ('ggplot2')
+    install.packages ('scales')
+    install.packages ('plyr')
+    install.packages ('doBy')
