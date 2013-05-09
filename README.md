@@ -8,18 +8,18 @@ The code should also work with the latest version of ndnSIM, but it is not guara
     mkdir ns-dev
     cd ns-dev
 
-    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git -b ns-3.16-ndnSIM ns-3
+    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git -b 4a3080996f4dcc550fc29a7f5521c2ff60fa5aae ns-3
     git clone git://github.com/cawka/pybindgen.git pybindgen
-    git clone git://github.com/NDN-Routing/ndnSIM.git -b v0.2.8 ns-3/src/ndnSIM
+    git clone git://github.com/NDN-Routing/ndnSIM.git -b ee4ce7edaeb304f21399c0d18d1061afe81a0161 ns-3/src/ndnSIM
 
-    git clone git://github.com/cawka/ndnSIM-sample-topologies.git ndnSIM-sample-topologies
+    git clone git://github.com/cawka/ndnSIM-ddos-interest-flooding.git ndnSIM-ddos-interest-flooding
 
     cd ns-3
     ./waf configure -d optimized
     ./waf
     sudo ./waf install
 
-    cd ../ndnSIM-sample-topologies
+    cd ../ndnSIM-ddos-interest-flooding
 
 After which you can proceed to compile and run the code
 
@@ -118,7 +118,29 @@ To convert topologies from RocketFuel format and assign random bandwidths and de
 You can edit ``run.py`` script and ``scenarios/rocketfuel-maps-cch-to-annotaded.cc`` to modifiy topology conversion logic
 (e.g., you may want to assign different bandwidth range for "backbone-to-backbone" links).
 
+`./run.py` script uses `workerpool` python module, which can be installed on Ubuntu using `easy_install` command:
+
+    sudo easy_install workerpool
+
+Or on Mac that uses `macports`:
+
+    sudo port install py27-workerpool
+
+If `easy_install` is not yet installed, you can install it using the following command:
+
+    sudo apt-get install python-setuptools
+
 For more information about Rocketfuel topology files, please refer to http://www.cs.washington.edu/research/networking/rocketfuel/
+
+You would also need `sqlite3` installed:
+
+On Unbuntu:
+
+    sudo apt-get install sqlite3
+
+On Mac with macports:
+
+    sudo port install sqlite3
 
 Interest flooding attack and attack mitigation mechanisms
 ---------------------------------------------------------
@@ -161,13 +183,10 @@ Additional graphs (Figure 9 from the paper) can be build using:
 
     ./run.py -p figure9
 
-**Note that provided scripts rely on R (http://www.r-project.org/) with sqldf, proto, reshape2, ggplot2, scales, plyr, and doBy modules to be installed.**  For example, after you install R, run the following to install necessary modules:
+**Note that provided scripts rely on R version at least 2.15 (http://www.r-project.org/) with sqldf, proto, reshape2, ggplot2, scales, plyr, and doBy modules to be installed.**  For example, after you install R, run the following to install necessary modules:
 
     sudo R
-    install.packages ('sqldf')
+    install.packages ('sqldf', dep=TRUE)
     install.packages ('proto')
-    install.packages ('reshape2')
-    install.packages ('ggplot2')
-    install.packages ('scales')
-    install.packages ('plyr')
-    install.packages ('doBy')
+    install.packages ('ggplot2', dep=TRUE)
+    install.packages ('doBy', dep=TRUE)
