@@ -8,9 +8,9 @@ The code should also work with the latest version of ndnSIM, but it is not guara
     mkdir ns-dev
     cd ns-dev
 
-    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git -b 4a3080996f4dcc550fc29a7f5521c2ff60fa5aae ns-3
+    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git -b ns-3.17.rcX-ndnSIM ns-3
     git clone git://github.com/cawka/pybindgen.git pybindgen
-    git clone git://github.com/NDN-Routing/ndnSIM.git -b ee4ce7edaeb304f21399c0d18d1061afe81a0161 ns-3/src/ndnSIM
+    git clone git://github.com/NDN-Routing/ndnSIM.git -b v0.4.1 ns-3/src/ndnSIM
 
     git clone git://github.com/cawka/ndnSIM-ddos-interest-flooding.git ndnSIM-ddos-interest-flooding
 
