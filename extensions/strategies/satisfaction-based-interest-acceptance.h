@@ -94,7 +94,7 @@ SatisfactionBasedInterestAcceptance<Parent>::GetTypeId (void)
     .template SetParent <super> ()
     .template AddConstructor <SatisfactionBasedInterestAcceptance> ()
 
-    .template AddAttribute ("GraceThreshold", "Fraction of resources that we are willing to sacrifice for \"bad traffic\"",
+    .AddAttribute ("GraceThreshold", "Fraction of resources that we are willing to sacrifice for \"bad traffic\"",
                             DoubleValue (0.05),
                             MakeDoubleAccessor (&SatisfactionBasedInterestAcceptance::m_graceThreshold),
                             MakeDoubleChecker<double> ())
