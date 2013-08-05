@@ -68,7 +68,7 @@ DdosApp::~DdosApp ()
 }
 
 void
-DdosApp::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPacket)
+DdosApp::OnNack (const Ptr<const Interest> &interest)
 {
   // immediately send new packet, without taking into account periodicity
   // m_nextSendEvent.Cancel ();
@@ -77,8 +77,7 @@ DdosApp::OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> origPack
 }
 
 void
-DdosApp::OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
-			  Ptr<Packet> payload)
+DdosApp::OnData (const Ptr<const Data> &data)
 {
   // who cares
 }
@@ -89,20 +88,17 @@ DdosApp::SendPacket ()
   m_seq++;
   // send packet
   Ptr<NameComponents> nameWithSequence = Create<NameComponents> (m_prefix);
-  (*nameWithSequence) (m_seq);
+  nameWithSequence->appendSeqNum (m_seq);
 
-  InterestHeader interestHeader;
-  interestHeader.SetNonce            (m_rand.GetValue ());
-  interestHeader.SetName             (nameWithSequence);
-  interestHeader.SetInterestLifetime (m_lifetime);
+  Ptr<Interest> interest = Create<Interest> ();
+  interest->SetNonce            (m_rand.GetValue ());
+  interest->SetName             (nameWithSequence);
+  interest->SetInterestLifetime (m_lifetime);
         
   NS_LOG_INFO ("> Interest for " << m_seq << ", lifetime " << m_lifetime.ToDouble (Time::S) << "s");
 
-  Ptr<Packet> packet = Create<Packet> ();
-  packet->AddHeader (interestHeader);
-
-  m_protocolHandler (packet);
-  m_transmittedInterests (&interestHeader, this, m_face);
+  m_face->ReceiveInterest (interest);
+  m_transmittedInterests (interest, this, m_face);
 
   // std::cout << "Size: " << packet->GetSize () << std::endl;
   

@@ -104,8 +104,7 @@ template<class Parent>
 bool
 TokenBucketWithPerInterfaceFairness<Parent>::TrySendOutInterest (Ptr<Face> inFace,
                                           Ptr<Face> outFace,
-                                          Ptr<const InterestHeader> header,
-                                          Ptr<const Packet> origPacket,
+                                          Ptr<const Interest> interest,
                                           Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -119,9 +118,9 @@ TokenBucketWithPerInterfaceFairness<Parent>::TrySendOutInterest (Ptr<Face> inFac
       return true; // already in the queue
     }
   
-  if (header->GetInterestLifetime () < Seconds (0.1))
+  if (interest->GetInterestLifetime () < Seconds (0.1))
     {
-      NS_LOG_DEBUG( "Interest lifetime is so short? [" << header->GetInterestLifetime ().ToDouble (Time::S) << "s]");
+      NS_LOG_DEBUG( "Interest lifetime is so short? [" << interest->GetInterestLifetime ().ToDouble (Time::S) << "s]");
     }
   
   pit::Entry::out_iterator outgoing =
@@ -143,15 +142,14 @@ TokenBucketWithPerInterfaceFairness<Parent>::TrySendOutInterest (Ptr<Face> inFac
       pitEntry->AddOutgoing (outFace);
 
       //transmission
-      Ptr<Packet> packetToSend = origPacket->Copy ();
-      outFace->Send (packetToSend);
+      outFace->SendInterest (interest);
 
-      this->DidSendOutInterest (inFace, outFace, header, origPacket, pitEntry);      
+      this->DidSendOutInterest (inFace, outFace, interest, pitEntry);      
       return true;
     }
   else
     {
-      NS_LOG_DEBUG ("Face limit for " << header->GetName ());
+      NS_LOG_DEBUG ("Face limit for " << interest->GetName ());
     }
 
   // hack
@@ -198,7 +196,7 @@ TokenBucketWithPerInterfaceFairness<Parent>::WillEraseTimedOutPendingInterest (P
 template<class Parent>
 void
 TokenBucketWithPerInterfaceFairness<Parent>::WillSatisfyPendingInterest (Ptr<Face> inFace,
-                                          Ptr<pit::Entry> pitEntry)
+                                                                         Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
   super::WillSatisfyPendingInterest (inFace, pitEntry);
@@ -249,19 +247,8 @@ TokenBucketWithPerInterfaceFairness<Parent>::ProcessFromQueue ()
           faceLimits->BorrowLimit ();
           pitEntry->AddOutgoing (outFace);
 
-          Ptr<Packet> packetToSend = Create<Packet> ();
-          Ptr<InterestHeader> header = Create<InterestHeader> (*pitEntry->GetInterest ());
-          NS_LOG_DEBUG ("Adjust interest lifetime to " << pitEntry->GetExpireTime () - Simulator::Now () << "s");
-          // header->SetInterestLifetime (
-          //                              // header->GetInterestLifetime () - ()
-          //                              pitEntry->GetExpireTime () - Simulator::Now ()
-          //                              );
-          // std::cerr << "New lifetime: " << (pitEntry->GetExpireTime () - Simulator::Now ()).ToDouble (Time::S) << "s" << std::endl;
-          packetToSend->AddHeader (*header);
-
-          NS_LOG_DEBUG ("Delayed sending for " << pitEntry->GetPrefix ());
-          outFace->Send (packetToSend);
-          this->DidSendOutInterest (queue->first, outFace, pitEntry->GetInterest (), packetToSend, pitEntry);
+          outFace->SendInterest (pitEntry->GetInterest ());
+          this->DidSendOutInterest (queue->first, outFace, pitEntry->GetInterest (), pitEntry);
         }
     }
 }

@@ -63,7 +63,7 @@ Stats<Parent>::GetTypeId ()
 
 template<class Parent>
 Stats<Parent>::Stats ()
-  : m_tree ("")
+  : m_tree (name::Component ())
   , m_statsRefreshScheduled (false)
 {
 }
@@ -103,14 +103,13 @@ Stats<Parent>::NotifyNewAggregate ()
 // template<class Parent>
 // void
 // Stats<Parent>::DidCreatePitEntry (Ptr<Face> inFace,
-//                                   Ptr<const InterestHeader> header,
-//                                   Ptr<const Packet> origPacket,
+//                                   Ptr<const Interest> interest,
 //                                   Ptr<pit::Entry> pitEntry)
 // {
 //   // NS_LOG_FUNCTION (inFace);
-//   super::DidCreatePitEntry (inFace, header, origPacket, pitEntry);
+//   super::DidCreatePitEntry (inFace, interest, pitEntry);
 
-//   std::pair<tree_type::iterator, bool> item = m_tree.insert (header->GetName ().cut (1), LoadStatsNode ());
+//   std::pair<tree_type::iterator, bool> item = m_tree.insert (interest->GetName ().cut (1), LoadStatsNode ());
 //   item.first->payload ().AddIncoming (inFace);
 // }
 
@@ -118,14 +117,14 @@ template<class Parent>
 void
 Stats<Parent>::DidSendOutInterest (Ptr<Face> inFace,
                                    Ptr<Face> outFace,
-                                   Ptr<const InterestHeader> header,
-                                   Ptr<const Packet> origPacket,
+                                   Ptr<const Interest> interest,
                                    Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (inFace);
-  super::DidSendOutInterest (inFace, outFace, header, origPacket, pitEntry);
+  super::DidSendOutInterest (inFace, outFace, interest, pitEntry);
 
-  std::pair<tree_type::iterator, bool> item = m_tree.insert (header->GetName ().cut (1), LoadStatsNode ());
+  std::pair<tree_type::iterator, bool> item = m_tree.insert (interest->GetName ().getPrefix (interest->GetName ().size ()-1),
+                                                             LoadStatsNode ());
   item.first->payload ().AddIncoming (inFace);
 }
 
@@ -135,7 +134,8 @@ Stats<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (pitEntry->GetPrefix ());
 
-  std::pair<tree_type::iterator, bool> item = m_tree.insert (pitEntry->GetPrefix ().cut (1), LoadStatsNode ());
+  std::pair<tree_type::iterator, bool> item = m_tree.insert (pitEntry->GetPrefix ().getPrefix (pitEntry->GetPrefix ().size ()-1),
+                                                             LoadStatsNode ());
   BOOST_FOREACH (const pit::IncomingFace &inFace, pitEntry->GetIncoming ())
     {
       item.first->payload ().AddUnsatisfied (inFace.m_face);
@@ -147,8 +147,7 @@ Stats<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 // template<class Parent>
 // void
 // Stats<Parent>::DidExhaustForwardingOptions (Ptr<Face> inFace,
-//                                             Ptr<const InterestHeader> header,
-//                                             Ptr<const Packet> origPacket,
+//                                             Ptr<const Interest> interest,
 //                                             Ptr<pit::Entry> pitEntry)
 // {
 //   // NS_LOG_FUNCTION (inFace);
@@ -160,7 +159,7 @@ Stats<Parent>::WillEraseTimedOutPendingInterest (Ptr<pit::Entry> pitEntry)
 //       item.first->payload ().AddUnsatisfied (inFace.m_face);
 //     }
 
-//   super::DidExhaustForwardingOptions (inFace, header, origPacket, pitEntry);
+//   super::DidExhaustForwardingOptions (inFace, interest, pitEntry);
 // }
 
 
@@ -196,7 +195,7 @@ Stats<Parent>::RemoveFace (Ptr<Face> face)
 
 template<class Parent>
 const ndnSIM::LoadStatsNode &
-Stats<Parent>::GetStats (const NameComponents &key) const
+Stats<Parent>::GetStats (const Name &key) const
 {
   tree_type::iterator foundItem, lastItem;
   bool reachLast;

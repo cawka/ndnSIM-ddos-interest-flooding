@@ -115,13 +115,12 @@ SatisfactionBasedPushback<Parent>::AddFace (Ptr<Face> face)
 template<class Parent>
 void
 SatisfactionBasedPushback<Parent>::OnInterest (Ptr<Face> face,
-                          Ptr<const InterestHeader> header,
-                          Ptr<const Packet> origPacket)
+                                               Ptr<Interest> interest)
 {
-  if (header->GetScope () != 0)
-    super::OnInterest (face, header, origPacket);
+  if (interest->GetScope () != 0)
+    super::OnInterest (face, interest);
   else
-    ApplyAnnouncedLimit (face, header);
+    ApplyAnnouncedLimit (face, interest);
 }
 
 
@@ -142,7 +141,7 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
       double unsatisfiedAbs = 0.0;
       double countAbs       = 0.0;
           
-      const ndnSIM::LoadStatsNode &stats = this->GetStats ("/");
+      const ndnSIM::LoadStatsNode &stats = this->GetStats (Name ());
       ndnSIM::LoadStatsNode::stats_container::const_iterator item = stats.incoming ().find (inFace);
       if (item != stats.incoming ().end ())
         {
@@ -191,8 +190,8 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
        entry != this->m_fib->End ();
        entry = this->m_fib->Next (entry))
     {
-      InterestHeader announceInterest;
-      announceInterest.SetScope (0); // link-local
+      Ptr<Interest> announceInterest = Create<Interest> ();
+      announceInterest->SetScope (0); // link-local
 
       double totalAllowance = 0.0;
       bool unlimited = false;
@@ -224,7 +223,7 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
           double unsatisfiedAbs = 0.0;
           double countAbs       = 0.0;
           
-          const ndnSIM::LoadStatsNode &stats = this->GetStats ("/");
+          const ndnSIM::LoadStatsNode &stats = this->GetStats (Name ());
           ndnSIM::LoadStatsNode::stats_container::const_iterator item = stats.incoming ().find (inFace);
           if (item != stats.incoming ().end ())
             {
@@ -259,18 +258,15 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
           weight = static_cast<double> (std::max (0.0, weight * totalAllowance));
           
           Ptr<NameComponents> prefixWithLimit = Create<NameComponents> (entry->GetPrefix ());
-          (*prefixWithLimit)
-            ("limit")
-            (weight);
+          prefixWithLimit
+            ->append ("limit")
+            .append (boost::lexical_cast<std::string> (weight));
 
           NS_LOG_DEBUG ("announce: " << *prefixWithLimit);
-          announceInterest.SetName (prefixWithLimit);
+          announceInterest->SetName (prefixWithLimit);
           // lifetime is 0
 
-          Ptr<Packet> pkt = Create<Packet> ();
-          pkt->AddHeader (announceInterest);
-
-          inFace->Send (pkt);
+          inFace->SendInterest (announceInterest);
           m_onLimitsAnnounce (inFace, realWeight, weight/totalAllowance, weight);
         }
     }
@@ -282,13 +278,13 @@ SatisfactionBasedPushback<Parent>::AnnounceLimits ()
 template<class Parent>
 void
 SatisfactionBasedPushback<Parent>::ApplyAnnouncedLimit (Ptr<Face> inFace,
-                                   Ptr<const InterestHeader> header)
+                                                        Ptr<const Interest> interest)
 {
   // Ptr<fib::Entry> fibEntry = m_fib->LongestPrefixMatch (header);
   // if (fibEntry == 0)
   //   return;
 
-  double limit = boost::lexical_cast<double> (header->GetName ().GetLastComponent ());
+  double limit = boost::lexical_cast<double> (interest->GetName ().get (-1));
   inFace->GetObject<Limits> ()->UpdateCurrentLimit (limit);
 }
 

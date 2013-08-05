@@ -24,7 +24,7 @@
 
 #include <ns3/ndn-forwarding-strategy.h>
 
-#include <ns3/ndn-name-components.h>
+#include <ns3/ndnSIM/ndn.cxx/name.h>
 #include <ns3/ndnSIM/utils/trie/trie.h>
 
 #include "stats/load-stats-node.h"
@@ -45,7 +45,7 @@ class Stats :
   typedef Parent super;
 
 public:
-  typedef ndnSIM::trie< NameComponents,
+  typedef ndnSIM::trie< Name,
                         ndnSIM::non_pointer_traits< ndnSIM::LoadStatsNode >, void* > tree_type;
 
   static TypeId
@@ -60,7 +60,7 @@ public:
   Stats ();
 
   const ndnSIM::LoadStatsNode &
-  GetStats (const NameComponents &key) const;
+  GetStats (const Name &key) const;
   
   virtual void
   RemoveFace (Ptr<Face> face);
@@ -68,15 +68,13 @@ public:
 protected:
   // virtual void
   // DidCreatePitEntry (Ptr<Face> inFace,
-  //                    Ptr<const InterestHeader> header,
-  //                    Ptr<const Packet> packet,
+  //                    Ptr<const Interest> interest,
   //                    Ptr<pit::Entry> pitEntry);
 
   virtual void
   DidSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);  
   
   virtual void

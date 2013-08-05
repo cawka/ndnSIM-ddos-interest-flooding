@@ -58,8 +58,7 @@ public:
   
   virtual void
   OnInterest (Ptr<Face> face,
-              Ptr<const InterestHeader> header,
-              Ptr<const Packet> origPacket);
+              Ptr<Interest> interest);
 
   virtual void
   AddFace (Ptr<Face> face);
@@ -70,7 +69,7 @@ private:
 
   void
   ApplyAnnouncedLimit (Ptr<Face> inFace,
-                       Ptr<const InterestHeader> header);
+                       Ptr<const Interest> interest);
 
 protected:
   // from Object

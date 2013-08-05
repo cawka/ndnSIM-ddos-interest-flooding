@@ -69,8 +69,7 @@ protected:
   bool
   CanSendOutInterest (Ptr<Face> inFace,
                       Ptr<Face> outFace,
-                      Ptr<const InterestHeader> header,
-                      Ptr<const Packet> origPacket,
+                      Ptr<const Interest> interest,
                       Ptr<pit::Entry> pitEntry);
   
 private:
@@ -123,8 +122,7 @@ template<class Parent>
 bool
 SatisfactionBasedInterestAcceptance<Parent>::CanSendOutInterest (Ptr<Face> inFace,
                                                                  Ptr<Face> outFace,
-                                                                 Ptr<const InterestHeader> header,
-                                                                 Ptr<const Packet> origPacket,
+                                                                 Ptr<const Interest> interest,
                                                                  Ptr<pit::Entry> pitEntry)
 {
   NS_LOG_FUNCTION (this << pitEntry->GetPrefix ());
@@ -149,7 +147,7 @@ SatisfactionBasedInterestAcceptance<Parent>::CanSendOutInterest (Ptr<Face> inFac
   double unsatisfiedAbs = 0.0;
   double countAbs       = 0.0;
           
-  const ndnSIM::LoadStatsNode &stats = this->GetStats ("/");
+  const ndnSIM::LoadStatsNode &stats = this->GetStats (Name ());
   ndnSIM::LoadStatsNode::stats_container::const_iterator item = stats.incoming ().find (inFace);
   if (item != stats.incoming ().end ())
     {
@@ -178,7 +176,7 @@ SatisfactionBasedInterestAcceptance<Parent>::CanSendOutInterest (Ptr<Face> inFac
     }
 
   // should be PerOutFaceLimits
-  return super::CanSendOutInterest (inFace, outFace, header, origPacket, pitEntry);
+  return super::CanSendOutInterest (inFace, outFace, interest, pitEntry);
 }
 
 

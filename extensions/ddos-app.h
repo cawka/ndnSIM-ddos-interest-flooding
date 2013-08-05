@@ -37,11 +37,10 @@ public:
   virtual ~DdosApp ();
 
   virtual void
-  OnNack (const Ptr<const InterestHeader> &interest, Ptr<Packet> packet);
+  OnNack (const Ptr<const Interest> &interest);
 
   virtual void
-  OnContentObject (const Ptr<const ContentObjectHeader> &contentObject,
-                   Ptr<Packet> payload);
+  OnData (const Ptr<const Data> &contentObject);
 
   /**
    * @brief Actually send packet
@@ -71,7 +70,7 @@ private:
   Time m_avgGap; ///< @brief average gap between interests (should be short, but still should be, otherwise simulation will never finishes)
   // default interest
   // InterestHeader m_defaultInterest;
-  NameComponents m_prefix;
+  Name m_prefix;
   bool m_evilBit;
   bool m_dataBasedLimit;
 };

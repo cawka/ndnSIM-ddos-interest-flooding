@@ -8,9 +8,11 @@ The code should also work with the latest version of ndnSIM, but it is not guara
     mkdir ns-dev
     cd ns-dev
 
-    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git -b ns-3.17.rcX-ndnSIM ns-3
+    git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
+    (cd ns-3 && git checkout -b ns-3.17-ndnSIM-0.5  origin/ns-3.17-ndnSIM-0.5)
     git clone git://github.com/cawka/pybindgen.git pybindgen
-    git clone git://github.com/NDN-Routing/ndnSIM.git -b v0.4.1 ns-3/src/ndnSIM
+    git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
+    (cd ns-3/src/ndnSIM && git checkout -b v0.5-rc2 4699242353245b7964e61a0853845cb6da920a65)
 
     git clone git://github.com/cawka/ndnSIM-ddos-interest-flooding.git ndnSIM-ddos-interest-flooding
 
@@ -33,7 +35,7 @@ To configure in optimized mode without logging **(default)**:
     ./waf configure
 
 To configure in optimized mode with scenario logging enabled (logging in NS-3 and ndnSIM modules will still be disabled,
-but you can see output from NS_LOG* calls from your scenarios and extensions):
+but you can see output from ``NS_LOG*`` calls from your scenarios and extensions):
 
     ./waf configure --logging
 
