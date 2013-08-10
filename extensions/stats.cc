@@ -21,7 +21,7 @@
 #include "stats.h"
 
 #include "ns3/ndn-interest.h"
-#include "ns3/ndn-content-object.h"
+#include "ns3/ndn-data.h"
 #include "ns3/ndn-pit.h"
 #include "ns3/ndn-pit-entry.h"
 

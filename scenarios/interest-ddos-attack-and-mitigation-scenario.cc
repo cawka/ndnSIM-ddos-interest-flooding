@@ -22,8 +22,6 @@
 #include "ns3/network-module.h"
 #include "ns3/ndnSIM-module.h"
 
-#include <ns3/ndnSIM/utils/tracers/ndn-l3-rate-tracer.h>
-
 #include <boost/lexical_cast.hpp>
 
 using namespace ns3;
@@ -321,16 +319,15 @@ int main (int argc, char**argv)
   
   ph.Install (producerNodes);
 
-  {
-  boost::tuple< boost::shared_ptr<std::ostream>, std::list<Ptr<L3RateTracer> > >
-    tracers = L3RateTracer::InstallAll (results_file, Seconds (1.0));
+  L3RateTracer::InstallAll (results_file, Seconds (1.0));
   
   Simulator::Schedule (Seconds (10.0), PrintTime, Seconds (10.0), name);
 
   Simulator::Stop (Seconds (900.0));
   Simulator::Run ();
   Simulator::Destroy ();
-  }
+ 
+  L3RateTracer::Destroy ();
 
   cerr << "Archiving to: " << results_file << ".bz2" << endl;
   system (("rm -f \"" + results_file + ".bz2" + "\"").c_str() );
