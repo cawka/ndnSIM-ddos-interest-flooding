@@ -9,7 +9,7 @@ The code should also work with the latest version of ndnSIM, but it is not guara
     cd ns-dev
 
     git clone git://github.com/cawka/ns-3-dev-ndnSIM.git ns-3
-    (cd ns-3 && git checkout -b ns-3.17-ndnSIM-0.5  origin/ns-3.17-ndnSIM-0.5)
+    (cd ns-3 && git checkout -b ndnSIM-v1.0 bb96dc1e3ba9d940ab1aae44224fa2b8b45e1a12)
     git clone git://github.com/cawka/pybindgen.git pybindgen
     git clone git://github.com/NDN-Routing/ndnSIM.git ns-3/src/ndnSIM
     (cd ns-3/src/ndnSIM && git checkout -b v0.5-rc2 db5f3b6acf526918be0a6a67c11378fa32cb27de)
